@@ -24,13 +24,13 @@ It powers executable Go scripts and plugins, in embedded interpreters or interac
 ### Go package
 
 ```go
-import "github.com/traefik/yaegi/interp"
+import "github.com/pangdogs/yaegi/interp"
 ```
 
 ### Command-line executable
 
 ```bash
-go install github.com/traefik/yaegi/cmd/yaegi@latest
+go install github.com/pangdogs/yaegi/cmd/yaegi@latest
 ```
 
 Note that you can use [rlwrap](https://github.com/hanslub42/rlwrap) (install with your favorite package manager),
@@ -52,8 +52,8 @@ Create an interpreter with `New()`, run Go code with `Eval()`:
 package main
 
 import (
-	"github.com/traefik/yaegi/interp"
-	"github.com/traefik/yaegi/stdlib"
+	"github.com/pangdogs/yaegi/interp"
+	"github.com/pangdogs/yaegi/stdlib"
 )
 
 func main() {
@@ -86,7 +86,7 @@ The following program is compiled ahead of time, except `bar()` which is interpr
 ```go
 package main
 
-import "github.com/traefik/yaegi/interp"
+import "github.com/pangdogs/yaegi/interp"
 
 const src = `package foo
 func Bar(s string) string { return s + "-Foo" }`
@@ -140,7 +140,7 @@ $ yaegi
 Or interpret Go packages, directories or files, including itself:
 
 ```console
-$ yaegi -syscall -unsafe -unrestricted github.com/traefik/yaegi/cmd/yaegi
+$ yaegi -syscall -unsafe -unrestricted github.com/pangdogs/yaegi/cmd/yaegi
 >
 ```
 
