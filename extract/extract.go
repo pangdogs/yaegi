@@ -139,6 +139,7 @@ type Extractor struct {
 	Exclude []string // Comma separated list of regexp matching symbols to exclude.
 	Include []string // Comma separated list of regexp matching symbols to include.
 	Tag     []string // Comma separated of build tags to be added to the created package.
+	StdLib  bool     // 标准库
 }
 
 func (e *Extractor) genContent(importPath string, p *types.Package) ([]byte, error) {
@@ -187,9 +188,11 @@ func (e *Extractor) genContent(importPath string, p *types.Package) ([]byte, err
 		}
 
 		pname := p.Name() + "." + name
-		if rname := p.Name() + name; restricted[rname] {
-			// Restricted symbol, locally provided by stdlib wrapper.
-			pname = rname
+		if e.StdLib {
+			if rname := p.Name() + name; restricted[rname] {
+				// Restricted symbol, locally provided by stdlib wrapper.
+				pname = rname
+			}
 		}
 
 		switch o := o.(type) {
