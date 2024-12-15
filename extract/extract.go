@@ -229,7 +229,7 @@ func (e *Extractor) genContent(importPath string, p *types.Package, fset *token.
 				//	continue
 				//}
 				val[name] = Val{fmt.Sprintf("interp.GenericFunc(%q)", b), false}
-				imports["github.com/traefik/yaegi/interp"] = true
+				imports["github.com/pangdogs/yaegi/interp"] = true
 				continue
 			}
 			val[name] = Val{pname, false}
