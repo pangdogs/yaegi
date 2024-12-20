@@ -20,7 +20,6 @@ func extractCmd(arg []string) error {
 	var exclude string
 	var include string
 	var tag string
-	var stdlib bool
 
 	eflag := flag.NewFlagSet("run", flag.ContinueOnError)
 	eflag.StringVar(&licensePath, "license", "", "path to a LICENSE file")
@@ -28,7 +27,6 @@ func extractCmd(arg []string) error {
 	eflag.StringVar(&exclude, "exclude", "", "comma separated list of regexp matching symbols to exclude")
 	eflag.StringVar(&include, "include", "", "comma separated list of regexp matching symbols to include")
 	eflag.StringVar(&tag, "tag", "", "comma separated list of build tags to be added to the created package")
-	eflag.BoolVar(&stdlib, "stdlib", false, "extract packages in the standard library")
 	eflag.Usage = func() {
 		fmt.Println("Usage: yaegi extract [options] packages...")
 		fmt.Println("Options:")
@@ -60,7 +58,6 @@ func extractCmd(arg []string) error {
 	ext := extract.Extractor{
 		Dest:    name,
 		License: license,
-		Stdlib:  stdlib,
 	}
 	if tag != "" {
 		ext.Tag = strings.Split(tag, ",")

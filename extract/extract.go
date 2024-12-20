@@ -11,6 +11,7 @@ import (
 	"go/constant"
 	"go/format"
 	"go/importer"
+	"go/parser"
 	"go/token"
 	"go/types"
 	"golang.org/x/tools/go/packages"
@@ -140,7 +141,6 @@ type Extractor struct {
 	Exclude []string // Comma separated list of regexp matching symbols to exclude.
 	Include []string // Comma separated list of regexp matching symbols to include.
 	Tag     []string // Comma separated of build tags to be added to the created package.
-	Stdlib  bool     // If true, extract symbols from standard library.
 }
 
 func (e *Extractor) genContent(importPath string, p *types.Package, fset *token.FileSet) ([]byte, error) {
@@ -189,7 +189,7 @@ func (e *Extractor) genContent(importPath string, p *types.Package, fset *token.
 		}
 
 		pname := p.Name() + "." + name
-		if e.Stdlib {
+		if isInStdlib(importPath) {
 			if rname := p.Name() + name; restricted[rname] {
 				// Restricted symbol, locally provided by stdlib wrapper.
 				pname = rname
@@ -215,20 +215,31 @@ func (e *Extractor) genContent(importPath string, p *types.Package, fset *token.
 				start -= base
 				end -= base
 
-				f, err := os.Open(ff.Name())
+				src, err := os.ReadFile(ff.Name())
 				if err != nil {
 					return nil, err
 				}
-				b := make([]byte, end-start)
-				_, err = f.ReadAt(b, int64(start))
+
+				af, err := parser.ParseFile(fset, "", src, parser.ImportsOnly)
 				if err != nil {
 					return nil, err
 				}
-				//// only add if we have a //yaegi:add directive
-				//if !bytes.Contains(b, []byte(`//yaegi:add`)) {
-				//	continue
-				//}
-				val[name] = Val{fmt.Sprintf("interp.GenericFunc(%q)", b), false}
+
+				buff := &bytes.Buffer{}
+
+				for _, imp := range af.Imports {
+					if imp.Name != nil {
+						fmt.Fprintf(buff, "import %s %q\n", imp.Name.Name, imp.Path.Value)
+					} else {
+						fmt.Fprintf(buff, "import %q\n", imp.Path.Value)
+					}
+				}
+
+				if _, err := io.CopyN(buff, bytes.NewReader(src[start:]), int64(end-start)); err != nil {
+					return nil, err
+				}
+
+				val[name] = Val{fmt.Sprintf("interp.GenericFunc(%q)", buff.String()), false}
 				imports["github.com/pangdogs/yaegi/interp"] = true
 				continue
 			}
