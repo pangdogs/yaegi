@@ -228,10 +228,12 @@ func (e *Extractor) genContent(importPath string, p *types.Package, fset *token.
 				buff := &bytes.Buffer{}
 
 				for _, imp := range af.Imports {
-					if imp.Name != nil {
-						fmt.Fprintf(buff, "import %s %q\n", imp.Name.Name, imp.Path.Value)
-					} else {
-						fmt.Fprintf(buff, "import %q\n", imp.Path.Value)
+					if imp.Path != nil {
+						if imp.Name != nil {
+							fmt.Fprintf(buff, "import %s %s\n", imp.Name.Name, imp.Path.Value)
+						} else {
+							fmt.Fprintf(buff, "import %s\n", imp.Path.Value)
+						}
 					}
 				}
 
