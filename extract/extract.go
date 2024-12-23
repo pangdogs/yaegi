@@ -41,7 +41,7 @@ import (
 	"{{$key}}"
 	{{- end}}
 {{- end}}
-{{- if or .Val .Typ }}
+{{- if .ImportSelf }}
 	"{{.ImportPath}}"
 {{- end}}
 	"reflect"
@@ -241,6 +241,10 @@ func (e *Extractor) genContent(importPath string, p *types.Package, fset *token.
 					return nil, err
 				}
 
+				if !bytes.Contains(buff.Bytes(), []byte(`//yaegi:add`)) {
+					continue
+				}
+				
 				val[name] = Val{fmt.Sprintf("interp.GenericFunc(%q)", buff.String()), false}
 				imports["github.com/pangdogs/yaegi/interp"] = true
 				continue
@@ -350,11 +354,27 @@ func (e *Extractor) genContent(importPath string, p *types.Package, fset *token.
 		buildTags = buildTags[1:]
 	}
 
+	importSelf := false
+
+	for _, v := range val {
+		if importSelf {
+			break
+		}
+		if !strings.HasPrefix(v.Name, "interp.GenericFunc(") {
+			importSelf = true
+		}
+	}
+
+	if !importSelf {
+		importSelf = len(typ) > 0
+	}
+
 	b := new(bytes.Buffer)
 	data := map[string]interface{}{
 		"Dest":       e.Dest,
 		"Imports":    imports,
 		"ImportPath": importPath,
+		"ImportSelf": importSelf,
 		"PkgName":    path.Join(importPath, p.Name()),
 		"Val":        val,
 		"Typ":        typ,
@@ -509,7 +529,7 @@ func (e *Extractor) Extract(pkgIdent, importPath string, rw io.Writer) (string, 
 			pkgIdent = filepath.Join("..", filepath.Base(pkgIdent))
 		}
 		// NeedsSyntax is needed for getting the scopes of generic functions.
-		pkgs, err := packages.Load(&packages.Config{Mode: packages.NeedTypes | packages.NeedSyntax}, pkgIdent)
+		pkgs, err := packages.Load(&packages.Config{Mode: packages.NeedTypes | packages.NeedSyntax, Tests: false}, pkgIdent)
 		if err != nil {
 			return "", err
 		}

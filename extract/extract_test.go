@@ -3,7 +3,7 @@ package extract
 import (
 	"bytes"
 	"os"
-	"path"
+	"path/filepath"
 	"strings"
 	"testing"
 )
@@ -168,7 +168,7 @@ func init() {
 				}()
 			}
 
-			dest := path.Base(wd)
+			dest := filepath.Base(wd)
 			if test.dest != "" {
 				dest = test.dest
 			}

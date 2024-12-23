@@ -24,7 +24,7 @@ import (
 	"io"
 	"log"
 	"os"
-	"path"
+	"path/filepath"
 	"runtime"
 	"strings"
 
@@ -50,7 +50,7 @@ func main() {
 	}
 
 	ext := extract.Extractor{
-		Dest: path.Base(wd),
+		Dest: filepath.Base(wd),
 	}
 
 	goos, goarch := os.Getenv("GOOS"), os.Getenv("GOARCH")
