@@ -8,10 +8,6 @@
 // (keys k where k != k), such as floating-point NaNs.
 package maps
 
-import (
-	// _ "unsafe" // FIXME(pangdogs): better handle special dependencies in generics.
-)
-
 // Equal reports whether two maps contain the same key/value pairs.
 // Values are compared using ==.
 func Equal[M1, M2 ~map[K]V, K, V comparable](m1 M1, m2 M2) bool {
@@ -40,15 +36,6 @@ func EqualFunc[M1 ~map[K]V1, M2 ~map[K]V2, K comparable, V1, V2 any](m1 M1, m2 M
 	return true
 }
 
-// FIXME(pangdogs): use 1.22
-//// clone is implemented in the runtime package.
-////
-////go:linkname clone maps.clone
-//func clone(m any) any
-func clone(m any) any {
-	return m
-}
-
 // Clone returns a copy of m.  This is a shallow clone:
 // the new keys and values are set using ordinary assignment.
 func Clone[M ~map[K]V, K comparable, V any](m M) M {
@@ -56,7 +43,11 @@ func Clone[M ~map[K]V, K comparable, V any](m M) M {
 	if m == nil {
 		return nil
 	}
-	return clone(m).(M)
+	copied := make(map[K]V, len(m))
+	for k, v := range m {
+	    copied[k] = v
+	}
+	return copied
 }
 
 // Copy copies all key/value pairs in src adding them to dst.

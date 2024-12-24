@@ -6,9 +6,7 @@
 package slices
 
 import (
-	"cmp"
-	"math/bits"
-    // "unsafe" // FIXME(pangdogs): better handle special dependencies in generics.
+	"unsafe"
 )
 
 // Equal reports whether two slices are equal: the same length and all
