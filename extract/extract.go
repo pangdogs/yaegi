@@ -360,10 +360,7 @@ func (e *Extractor) genContent(importPath string, p *types.Package, fset *token.
 		if importSelf {
 			break
 		}
-		if !strings.HasPrefix(v.Name, "interp.GenericFunc(") {
-			importSelf = true
-		}
-		if !strings.HasPrefix(v.Name, "constant.MakeFromLiteral(") {
+		if !strings.HasPrefix(v.Name, "interp.GenericFunc(") && !strings.HasPrefix(v.Name, "constant.MakeFromLiteral(") {
 			importSelf = true
 		}
 	}
