@@ -244,7 +244,7 @@ func (e *Extractor) genContent(importPath string, p *types.Package, fset *token.
 				if !bytes.Contains(buff.Bytes(), []byte(`//yaegi:add`)) {
 					continue
 				}
-				
+
 				val[name] = Val{fmt.Sprintf("interp.GenericFunc(%q)", buff.String()), false}
 				imports["github.com/pangdogs/yaegi/interp"] = true
 				continue
@@ -361,6 +361,9 @@ func (e *Extractor) genContent(importPath string, p *types.Package, fset *token.
 			break
 		}
 		if !strings.HasPrefix(v.Name, "interp.GenericFunc(") {
+			importSelf = true
+		}
+		if !strings.HasPrefix(v.Name, "constant.MakeFromLiteral(") {
 			importSelf = true
 		}
 	}
