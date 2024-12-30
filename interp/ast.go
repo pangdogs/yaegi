@@ -723,6 +723,14 @@ func (interp *Interpreter) ast(f ast.Node) (string, *node, error) {
 			st.push(n, nod)
 
 		case *ast.FuncType:
+			// fix functions with anonymous parameters
+			if a.Params.NumFields() > 0 {
+				for _, field := range a.Params.List {
+					if field.Names == nil {
+						field.Names = []*ast.Ident{ast.NewIdent("_")}
+					}
+				}
+			}
 			n := addChild(&root, anc, pos, funcType, aNop)
 			n.val = n
 			if a.TypeParams == nil {
