@@ -5,10 +5,6 @@
 // Package slices defines various functions useful with slices of any type.
 package slices
 
-import (
-	"unsafe"
-)
-
 // Equal reports whether two slices are equal: the same length and all
 // elements equal. If the lengths are different, Equal returns false.
 // Otherwise, the elements are compared in increasing index order, and the
@@ -45,20 +41,20 @@ func EqualFunc[S1 ~[]E1, S2 ~[]E2, E1, E2 any](s1 S1, s2 S2, eq func(E1, E2) boo
 	return true
 }
 
-// Compare compares the elements of s1 and s2, using [cmp.Compare] on each pair
+// Compare compares the elements of s1 and s2, using [CmpCompare] on each pair
 // of elements. The elements are compared sequentially, starting at index 0,
 // until one element is not equal to the other.
 // The result of comparing the first non-matching elements is returned.
 // If both slices are equal until one of them ends, the shorter slice is
 // considered less than the longer one.
 // The result is 0 if s1 == s2, -1 if s1 < s2, and +1 if s1 > s2.
-func Compare[S ~[]E, E cmp.Ordered](s1, s2 S) int {
+func Compare[S ~[]E, E CmpOrdered](s1, s2 S) int {
 	for i, v1 := range s1 {
 		if i >= len(s2) {
 			return +1
 		}
 		v2 := s2[i]
-		if c := cmp.Compare(v1, v2); c != 0 {
+		if c := CmpCompare(v1, v2); c != 0 {
 			return c
 		}
 	}
@@ -434,6 +430,8 @@ func rotateRight[E any](s []E, r int) {
 
 // overlaps reports whether the memory ranges a[0:len(a)] and b[0:len(b)] overlap.
 func overlaps[E any](a, b []E) bool {
+    return false
+    /*
 	if len(a) == 0 || len(b) == 0 {
 		return false
 	}
@@ -445,6 +443,7 @@ func overlaps[E any](a, b []E) bool {
 	// Also see crypto/internal/alias/alias.go:AnyOverlap
 	return uintptr(unsafe.Pointer(&a[0])) <= uintptr(unsafe.Pointer(&b[len(b)-1]))+(elemSize-1) &&
 		uintptr(unsafe.Pointer(&b[0])) <= uintptr(unsafe.Pointer(&a[len(a)-1]))+(elemSize-1)
+	*/
 }
 
 // startIdx returns the index in haystack where the needle starts.
@@ -494,7 +493,7 @@ func Repeat[S ~[]E, E any](x S, count int) S {
 	}
 
 	const maxInt = ^uint(0) >> 1
-	if hi, lo := bits.Mul(uint(len(x)), uint(count)); hi > 0 || lo > maxInt {
+	if hi, lo := BitsMul(uint(len(x)), uint(count)); hi > 0 || lo > maxInt {
 		panic("the result of (len(x) * count) overflows")
 	}
 

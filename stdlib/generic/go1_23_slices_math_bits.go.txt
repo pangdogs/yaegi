@@ -1,0 +1,108 @@
+package slices
+
+const bitsUintSize = 32 << (^uint(0) >> 63) // 32 or 64
+
+// UintSize is the size of a uint in bits.
+const BitsUintSize = bitsUintSize
+
+const bitsLen8tab = "" +
+	"\x00\x01\x02\x02\x03\x03\x03\x03\x04\x04\x04\x04\x04\x04\x04\x04" +
+	"\x05\x05\x05\x05\x05\x05\x05\x05\x05\x05\x05\x05\x05\x05\x05\x05" +
+	"\x06\x06\x06\x06\x06\x06\x06\x06\x06\x06\x06\x06\x06\x06\x06\x06" +
+	"\x06\x06\x06\x06\x06\x06\x06\x06\x06\x06\x06\x06\x06\x06\x06\x06" +
+	"\x07\x07\x07\x07\x07\x07\x07\x07\x07\x07\x07\x07\x07\x07\x07\x07" +
+	"\x07\x07\x07\x07\x07\x07\x07\x07\x07\x07\x07\x07\x07\x07\x07\x07" +
+	"\x07\x07\x07\x07\x07\x07\x07\x07\x07\x07\x07\x07\x07\x07\x07\x07" +
+	"\x07\x07\x07\x07\x07\x07\x07\x07\x07\x07\x07\x07\x07\x07\x07\x07" +
+	"\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08" +
+	"\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08" +
+	"\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08" +
+	"\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08" +
+	"\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08" +
+	"\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08" +
+	"\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08" +
+	"\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08"
+
+// Len32 returns the minimum number of bits required to represent x; the result is 0 for x == 0.
+func BitsLen32(x uint32) (n int) {
+	if x >= 1<<16 {
+		x >>= 16
+		n = 16
+	}
+	if x >= 1<<8 {
+		x >>= 8
+		n += 8
+	}
+	return n + int(bitsLen8tab[x])
+}
+
+// Len64 returns the minimum number of bits required to represent x; the result is 0 for x == 0.
+func BitsLen64(x uint64) (n int) {
+	if x >= 1<<32 {
+		x >>= 32
+		n = 32
+	}
+	if x >= 1<<16 {
+		x >>= 16
+		n += 16
+	}
+	if x >= 1<<8 {
+		x >>= 8
+		n += 8
+	}
+	return n + int(bitsLen8tab[x])
+}
+
+// Len returns the minimum number of bits required to represent x; the result is 0 for x == 0.
+func BitsLen(x uint) int {
+	if BitsUintSize == 32 {
+		return BitsLen32(uint32(x))
+	}
+	return BitsLen64(uint64(x))
+}
+
+// Mul32 returns the 64-bit product of x and y: (hi, lo) = x * y
+// with the product bits' upper half returned in hi and the lower
+// half returned in lo.
+//
+// This function's execution time does not depend on the inputs.
+func BitsMul32(x, y uint32) (hi, lo uint32) {
+	tmp := uint64(x) * uint64(y)
+	hi, lo = uint32(tmp>>32), uint32(tmp)
+	return
+}
+
+// Mul64 returns the 128-bit product of x and y: (hi, lo) = x * y
+// with the product bits' upper half returned in hi and the lower
+// half returned in lo.
+//
+// This function's execution time does not depend on the inputs.
+func BitsMul64(x, y uint64) (hi, lo uint64) {
+	const mask32 = 1<<32 - 1
+	x0 := x & mask32
+	x1 := x >> 32
+	y0 := y & mask32
+	y1 := y >> 32
+	w0 := x0 * y0
+	t := x1*y0 + w0>>32
+	w1 := t & mask32
+	w2 := t >> 32
+	w1 += x0 * y1
+	hi = x1*y1 + w2 + w1>>32
+	lo = x * y
+	return
+}
+
+// Mul returns the full-width product of x and y: (hi, lo) = x * y
+// with the product bits' upper half returned in hi and the lower
+// half returned in lo.
+//
+// This function's execution time does not depend on the inputs.
+func BitsMul(x, y uint) (hi, lo uint) {
+	if BitsUintSize == 32 {
+		h, l := BitsMul32(uint32(x), uint32(y))
+		return uint(h), uint(l)
+	}
+	h, l := BitsMul64(uint64(x), uint64(y))
+	return uint(h), uint(l)
+}

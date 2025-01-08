@@ -6,6 +6,14 @@
 
 package slices
 
+type sortedHint int // hint for pdqsort when choosing the pivot
+
+const (
+	unknownHint sortedHint = iota
+	increasingHint
+	decreasingHint
+)
+
 // insertionSortCmpFunc sorts data[a:b] using insertion sort.
 func insertionSortCmpFunc[E any](data []E, a, b int, cmp func(a, b E) int) {
 	for i := a + 1; i < b; i++ {
@@ -252,14 +260,6 @@ func breakPatternsCmpFunc[E any](data []E, a, b int, cmp func(a, b E) int) {
 		}
 	}
 }
-
-type sortedHint int // hint for pdqsort when choosing the pivot
-
-const (
-	unknownHint sortedHint = iota
-	increasingHint
-	decreasingHint
-)
 
 // choosePivotCmpFunc chooses a pivot in data[a:b].
 //
