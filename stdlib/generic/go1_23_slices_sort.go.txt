@@ -8,9 +8,9 @@ package slices
 
 // Sort sorts a slice of any ordered type in ascending order.
 // When sorting floating-point numbers, NaNs are ordered before other values.
-func Sort[S ~[]E, E CmpOrdered](x S) {
+func Sort[S ~[]E, E cmp.Ordered](x S) {
 	n := len(x)
-	pdqsortOrdered(x, 0, n, BitsLen(uint(n)))
+	pdqsortOrdered(x, 0, n, bitsLen(uint(n)))
 }
 
 // SortFunc sorts the slice x in ascending order as determined by the cmp
@@ -24,7 +24,7 @@ func Sort[S ~[]E, E CmpOrdered](x S) {
 // The function should return 0 for incomparable items.
 func SortFunc[S ~[]E, E any](x S, cmp func(a, b E) int) {
 	n := len(x)
-	pdqsortCmpFunc(x, 0, n, BitsLen(uint(n)), cmp)
+	pdqsortCmpFunc(x, 0, n, bitsLen(uint(n)), cmp)
 }
 
 // SortStableFunc sorts the slice x while keeping the original order of equal
@@ -34,9 +34,9 @@ func SortStableFunc[S ~[]E, E any](x S, cmp func(a, b E) int) {
 }
 
 // IsSorted reports whether x is sorted in ascending order.
-func IsSorted[S ~[]E, E CmpOrdered](x S) bool {
+func IsSorted[S ~[]E, E cmp.Ordered](x S) bool {
 	for i := len(x) - 1; i > 0; i-- {
-		if CmpLess(x[i], x[i-1]) {
+		if cmp.Less(x[i], x[i-1]) {
 			return false
 		}
 	}
@@ -57,7 +57,7 @@ func IsSortedFunc[S ~[]E, E any](x S, cmp func(a, b E) int) bool {
 // Min returns the minimal value in x. It panics if x is empty.
 // For floating-point numbers, Min propagates NaNs (any NaN value in x
 // forces the output to be NaN).
-func Min[S ~[]E, E CmpOrdered](x S) E {
+func Min[S ~[]E, E cmp.Ordered](x S) E {
 	if len(x) < 1 {
 		panic("slices.Min: empty list")
 	}
@@ -87,7 +87,7 @@ func MinFunc[S ~[]E, E any](x S, cmp func(a, b E) int) E {
 // Max returns the maximal value in x. It panics if x is empty.
 // For floating-point E, Max propagates NaNs (any NaN value in x
 // forces the output to be NaN).
-func Max[S ~[]E, E CmpOrdered](x S) E {
+func Max[S ~[]E, E cmp.Ordered](x S) E {
 	if len(x) < 1 {
 		panic("slices.Max: empty list")
 	}
@@ -118,7 +118,7 @@ func MaxFunc[S ~[]E, E any](x S, cmp func(a, b E) int) E {
 // position where target is found, or the position where target would appear
 // in the sort order; it also returns a bool saying whether the target is
 // really found in the slice. The slice must be sorted in increasing order.
-func BinarySearch[S ~[]E, E CmpOrdered](x S, target E) (int, bool) {
+func BinarySearch[S ~[]E, E cmp.Ordered](x S, target E) (int, bool) {
 	// Inlining is faster than calling BinarySearchFunc with a lambda.
 	n := len(x)
 	// Define x[-1] < target and x[n] >= target.
@@ -127,7 +127,7 @@ func BinarySearch[S ~[]E, E CmpOrdered](x S, target E) (int, bool) {
 	for i < j {
 		h := int(uint(i+j) >> 1) // avoid overflow when computing h
 		// i ≤ h < j
-		if CmpLess(x[h], target) {
+		if cmp.Less(x[h], target) {
 			i = h + 1 // preserves x[i-1] < target
 		} else {
 			j = h // preserves x[j] >= target
@@ -181,11 +181,11 @@ func (r *xorshift) Next() uint64 {
 }
 
 func nextPowerOfTwo(length int) uint {
-	return 1 << BitsLen(uint(length))
+	return 1 << bitsLen(uint(length))
 }
 
 // isNaN reports whether x is a NaN without requiring the math package.
 // This will always return false if T is not floating-point.
-func isNaN[T CmpOrdered](x T) bool {
+func isNaN[T cmp.Ordered](x T) bool {
 	return x != x
 }

@@ -1,9 +1,14 @@
 package slices
 
-const bitsUintSize = 32 << (^uint(0) >> 63) // 32 or 64
+import (
+	"cmp"
+	"iter"
+)
 
-// UintSize is the size of a uint in bits.
-const BitsUintSize = bitsUintSize
+const _bitsUintSize = 32 << (^uint(0) >> 63) // 32 or 64
+
+// bitsUintSize is the size of a uint in bits.
+const bitsUintSize = _bitsUintSize
 
 const bitsLen8tab = "" +
 	"\x00\x01\x02\x02\x03\x03\x03\x03\x04\x04\x04\x04\x04\x04\x04\x04" +
@@ -23,8 +28,8 @@ const bitsLen8tab = "" +
 	"\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08" +
 	"\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08\x08"
 
-// Len32 returns the minimum number of bits required to represent x; the result is 0 for x == 0.
-func BitsLen32(x uint32) (n int) {
+// bitsLen32 returns the minimum number of bits required to represent x; the result is 0 for x == 0.
+func bitsLen32(x uint32) (n int) {
 	if x >= 1<<16 {
 		x >>= 16
 		n = 16
@@ -36,8 +41,8 @@ func BitsLen32(x uint32) (n int) {
 	return n + int(bitsLen8tab[x])
 }
 
-// Len64 returns the minimum number of bits required to represent x; the result is 0 for x == 0.
-func BitsLen64(x uint64) (n int) {
+// bitsLen64 returns the minimum number of bits required to represent x; the result is 0 for x == 0.
+func bitsLen64(x uint64) (n int) {
 	if x >= 1<<32 {
 		x >>= 32
 		n = 32
@@ -53,31 +58,31 @@ func BitsLen64(x uint64) (n int) {
 	return n + int(bitsLen8tab[x])
 }
 
-// Len returns the minimum number of bits required to represent x; the result is 0 for x == 0.
-func BitsLen(x uint) int {
-	if BitsUintSize == 32 {
-		return BitsLen32(uint32(x))
+// bitsLen returns the minimum number of bits required to represent x; the result is 0 for x == 0.
+func bitsLen(x uint) int {
+	if bitsUintSize == 32 {
+		return bitsLen32(uint32(x))
 	}
-	return BitsLen64(uint64(x))
+	return bitsLen64(uint64(x))
 }
 
-// Mul32 returns the 64-bit product of x and y: (hi, lo) = x * y
+// bitsMul32 returns the 64-bit product of x and y: (hi, lo) = x * y
 // with the product bits' upper half returned in hi and the lower
 // half returned in lo.
 //
 // This function's execution time does not depend on the inputs.
-func BitsMul32(x, y uint32) (hi, lo uint32) {
+func bitsMul32(x, y uint32) (hi, lo uint32) {
 	tmp := uint64(x) * uint64(y)
 	hi, lo = uint32(tmp>>32), uint32(tmp)
 	return
 }
 
-// Mul64 returns the 128-bit product of x and y: (hi, lo) = x * y
+// bitsMul64 returns the 128-bit product of x and y: (hi, lo) = x * y
 // with the product bits' upper half returned in hi and the lower
 // half returned in lo.
 //
 // This function's execution time does not depend on the inputs.
-func BitsMul64(x, y uint64) (hi, lo uint64) {
+func bitsMul64(x, y uint64) (hi, lo uint64) {
 	const mask32 = 1<<32 - 1
 	x0 := x & mask32
 	x1 := x >> 32
@@ -93,16 +98,42 @@ func BitsMul64(x, y uint64) (hi, lo uint64) {
 	return
 }
 
-// Mul returns the full-width product of x and y: (hi, lo) = x * y
+// bitsMul returns the full-width product of x and y: (hi, lo) = x * y
 // with the product bits' upper half returned in hi and the lower
 // half returned in lo.
 //
 // This function's execution time does not depend on the inputs.
-func BitsMul(x, y uint) (hi, lo uint) {
-	if BitsUintSize == 32 {
-		h, l := BitsMul32(uint32(x), uint32(y))
+func bitsMul(x, y uint) (hi, lo uint) {
+	if bitsUintSize == 32 {
+		h, l := bitsMul32(uint32(x), uint32(y))
 		return uint(h), uint(l)
 	}
-	h, l := BitsMul64(uint64(x), uint64(y))
+	h, l := bitsMul64(uint64(x), uint64(y))
 	return uint(h), uint(l)
+}
+
+// min is a version of the predeclared function from the Go 1.21 release.
+func min[T cmp.Ordered](a, b T) T {
+	if a < b || cmpIsNaN(a) {
+		return a
+	}
+	return b
+}
+
+// max is a version of the predeclared function from the Go 1.21 release.
+func max[T cmp.Ordered](a, b T) T {
+	if a > b || cmpIsNaN(a) {
+		return a
+	}
+	return b
+}
+
+// clear sets all elements up to the length of s to the zero value of E.
+// We may use the builtin clear func instead, and remove clearSlice, when upgrading
+// to Go 1.21+.
+func clear[S ~[]E, E any](s S) {
+	var zero E
+	for i := range s {
+		s[i] = zero
+	}
 }
