@@ -270,6 +270,7 @@ func (check typecheck) binaryExpr(n *node) error {
 		}
 	}
 
+	// Ensure that if values are untyped, both are converted to the same type
 	_ = check.convertUntyped(c0, c1.typ)
 	_ = check.convertUntyped(c1, c0.typ)
 
