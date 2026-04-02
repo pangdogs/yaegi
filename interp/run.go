@@ -990,7 +990,7 @@ func genFunctionWrapper(n *node) func(*frame) reflect.Value {
 	funcType := n.typ.TypeOf()
 
 	value := genValue(n)
-	isDefer := false
+	var isDefer bool
 	if n.anc != nil && n.anc.anc != nil && n.anc.anc.kind == deferStmt {
 		isDefer = true
 	}
@@ -3765,7 +3765,7 @@ func send(n *node) {
 	next := getExec(n.tnext)
 	c0, c1 := n.child[0], n.child[1]
 	value0 := genValue(c0) // Send channel.
-	value1 := genDestValue(c0.typ.val, c1)
+	value1 := genDestValue(c0.typ.elem(), c1)
 
 	if !n.interp.cancelChan {
 		// Send is non-cancellable, has the least overhead.

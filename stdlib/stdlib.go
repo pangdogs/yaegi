@@ -1,4 +1,4 @@
-//go:build go1.21
+//go:build go1.25
 
 // Package stdlib provides wrappers of standard library packages to be imported natively in Yaegi.
 package stdlib
@@ -47,13 +47,18 @@ func init() {
 //go:generate ../internal/cmd/extract/extract crypto/ecdsa
 //go:generate ../internal/cmd/extract/extract crypto/ed25519
 //go:generate ../internal/cmd/extract/extract crypto/elliptic
+//go:generate ../internal/cmd/extract/extract crypto/fips140
+//go:generate ../internal/cmd/extract/extract crypto/hkdf
 //go:generate ../internal/cmd/extract/extract crypto/hmac
 //go:generate ../internal/cmd/extract/extract crypto/md5
+//go:generate ../internal/cmd/extract/extract crypto/mlkem
+//go:generate ../internal/cmd/extract/extract crypto/pbkdf2
 //go:generate ../internal/cmd/extract/extract crypto/rand
 //go:generate ../internal/cmd/extract/extract crypto/rc4
 //go:generate ../internal/cmd/extract/extract crypto/rsa
 //go:generate ../internal/cmd/extract/extract crypto/sha1
 //go:generate ../internal/cmd/extract/extract crypto/sha256
+//go:generate ../internal/cmd/extract/extract crypto/sha3
 //go:generate ../internal/cmd/extract/extract crypto/sha512
 //go:generate ../internal/cmd/extract/extract crypto/subtle
 //go:generate ../internal/cmd/extract/extract crypto/tls
@@ -68,6 +73,7 @@ func init() {
 //go:generate ../internal/cmd/extract/extract debug/macho
 //go:generate ../internal/cmd/extract/extract debug/pe
 //go:generate ../internal/cmd/extract/extract debug/plan9obj
+//go:generate ../internal/cmd/extract/extract embed
 //go:generate ../internal/cmd/extract/extract encoding
 //go:generate ../internal/cmd/extract/extract encoding/ascii85
 //go:generate ../internal/cmd/extract/extract encoding/asn1
@@ -97,6 +103,7 @@ func init() {
 //go:generate ../internal/cmd/extract/extract go/scanner
 //go:generate ../internal/cmd/extract/extract go/token
 //go:generate ../internal/cmd/extract/extract go/types
+//go:generate ../internal/cmd/extract/extract go/version
 //go:generate ../internal/cmd/extract/extract hash
 //go:generate ../internal/cmd/extract/extract hash/adler32
 //go:generate ../internal/cmd/extract/extract hash/crc32
@@ -116,6 +123,7 @@ func init() {
 //go:generate ../internal/cmd/extract/extract io
 //go:generate ../internal/cmd/extract/extract io/fs
 //go:generate ../internal/cmd/extract/extract io/ioutil
+//go:generate ../internal/cmd/extract/extract iter
 //go:generate ../internal/cmd/extract/extract log
 //go:generate ../internal/cmd/extract/extract log/slog
 //go:generate ../internal/cmd/extract/extract log/syslog
@@ -125,6 +133,7 @@ func init() {
 //go:generate ../internal/cmd/extract/extract math/bits
 //go:generate ../internal/cmd/extract/extract math/cmplx
 //go:generate ../internal/cmd/extract/extract math/rand
+//go:generate ../internal/cmd/extract/extract math/rand/v2
 //go:generate ../internal/cmd/extract/extract mime
 //go:generate ../internal/cmd/extract/extract mime/multipart
 //go:generate ../internal/cmd/extract/extract mime/quotedprintable
@@ -145,22 +154,27 @@ func init() {
 //go:generate ../internal/cmd/extract/extract net/textproto
 //go:generate ../internal/cmd/extract/extract net/url
 //go:generate ../internal/cmd/extract/extract os
+//go:generate ../internal/cmd/extract/extract os/exec
 //go:generate ../internal/cmd/extract/extract os/signal
 //go:generate ../internal/cmd/extract/extract os/user
 //go:generate ../internal/cmd/extract/extract path
 //go:generate ../internal/cmd/extract/extract path/filepath
+//go:generate ../internal/cmd/extract/extract plugin
 //go:generate ../internal/cmd/extract/extract reflect
 //go:generate ../internal/cmd/extract/extract regexp
 //go:generate ../internal/cmd/extract/extract regexp/syntax
 //go:generate ../internal/cmd/extract/extract runtime
+//go:generate ../internal/cmd/extract/extract runtime/coverage
 //go:generate ../internal/cmd/extract/extract runtime/debug
 //go:generate ../internal/cmd/extract/extract runtime/metrics
 //go:generate ../internal/cmd/extract/extract runtime/pprof
+//go:generate ../internal/cmd/extract/extract runtime/race
 //go:generate ../internal/cmd/extract/extract runtime/trace
 //go:generate ../internal/cmd/extract/extract slices
 //go:generate ../internal/cmd/extract/extract sort
 //go:generate ../internal/cmd/extract/extract strconv
 //go:generate ../internal/cmd/extract/extract strings
+//go:generate ../internal/cmd/extract/extract structs
 //go:generate ../internal/cmd/extract/extract sync
 //go:generate ../internal/cmd/extract/extract sync/atomic
 //go:generate ../internal/cmd/extract/extract testing
@@ -168,11 +182,15 @@ func init() {
 //go:generate ../internal/cmd/extract/extract testing/iotest
 //go:generate ../internal/cmd/extract/extract testing/quick
 //go:generate ../internal/cmd/extract/extract testing/slogtest
+//go:generate ../internal/cmd/extract/extract testing/synctest
 //go:generate ../internal/cmd/extract/extract text/scanner
 //go:generate ../internal/cmd/extract/extract text/tabwriter
 //go:generate ../internal/cmd/extract/extract text/template
 //go:generate ../internal/cmd/extract/extract text/template/parse
 //go:generate ../internal/cmd/extract/extract time
+//go:generate ../internal/cmd/extract/extract time/tzdata
 //go:generate ../internal/cmd/extract/extract unicode
 //go:generate ../internal/cmd/extract/extract unicode/utf16
 //go:generate ../internal/cmd/extract/extract unicode/utf8
+//go:generate ../internal/cmd/extract/extract unique
+//go:generate ../internal/cmd/extract/extract weak

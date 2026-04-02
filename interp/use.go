@@ -9,8 +9,6 @@ import (
 	"os"
 	"path"
 	"reflect"
-
-	gen "github.com/pangdogs/yaegi/stdlib/generic"
 )
 
 // Symbols returns a map of interpreter exported symbol values for the given
@@ -154,12 +152,12 @@ func (interp *Interpreter) Use(values Exports) error {
 	if _, ok := values["fmt/fmt"]; ok {
 		fixStdlib(interp)
 
-		// Load stdlib generic source.
-		for _, s := range gen.Sources {
-			if _, err := interp.Compile(s); err != nil {
-				return err
-			}
-		}
+		//// Load stdlib generic source.
+		//for _, s := range gen.Sources {
+		//	if _, err := interp.Compile(s); err != nil {
+		//		return err
+		//	}
+		//}
 	}
 	return nil
 }
